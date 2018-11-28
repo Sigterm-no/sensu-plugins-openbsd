@@ -16,7 +16,6 @@
 require 'sensu-plugin/check/cli'
 
 class CheckOpenBGPd < Sensu::Plugin::Check::CLI
-
   option :warn,
          short: '-w WARN',
          description: 'Percetage of peers in a connecting/not-working state before warning',
@@ -39,12 +38,16 @@ class CheckOpenBGPd < Sensu::Plugin::Check::CLI
       total_peers = num_peers + num_issue_peers
       peers_success_ratio = ((num_peers.to_f / total_peers.to_f) * 100).truncate(2)
 
-      message = "OpenBGPd running with #{num_peers+num_issue_peers} peers, #{peers_success_ratio}% (#{num_issue_peers}) in a connecting or errored state, #{num_fib_routes}. Knows FIB routes and #{num_rib_routes} RIB routes"
-      critical message if num_peers.zero?
-      ok message
+      message = "OpenBGPd running with #{total_peers} peers, "
+      message << "#{peers_success_ratio}% (#{num_issue_peers}) in a connecting or errored state, "
+      message << "#{num_fib_routes}. Knows FIB routes and #{num_rib_routes} RIB routes."
     rescue StandardError => e
-      unknown 'OpenBGPd command Failed: #{e}'
+      unknown "OpenBGPd command Failed: #{e}"
     end
-  end
 
+    critical message if num_peers.zero?
+    critical message if peers_success_ratio >= config[:crit] || peers_success_ratio <= -config[:crit]
+    warning message if peers_success_ratio >= config[:warn] || peers_success_ratio <= -config[:warn]
+    ok message
+  end
 end

@@ -76,7 +76,7 @@ class CheckNTP < Sensu::Plugin::Check::CLI
       # Offset
       offset = output[/offset (...), clock/, 1].strip
     rescue StandardError => e
-      unknown 'NTP command Failed: #{e}'
+      unknown "NTP command Failed: #{e}"
     end
 
     if output.include? unsynced
