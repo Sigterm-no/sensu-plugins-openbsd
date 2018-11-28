@@ -58,27 +58,24 @@ class CheckNTP < Sensu::Plugin::Check::CLI
          default: 'unknown'
 
   def run
-    output=''
+    output = ''
     begin
-      output=`ntpctl -s status`
+      output = `ntpctl -s status`
       # Peers
-      peersIdx=output.index('peers')
-      peersStr=output[0, peersIdx].strip
-      peersArray=peersStr.split('/')
-      numConnected = peersArray[0]
-      numAvailable = peersArray[1]
+      peers_idx = output.index('peers')
+      peers_str = output[0, peers_idx].strip
+      peers_array = peers_str.split('/')
+      num_connected = peers_array[0]
+      num_available = peers_array[1]
       # End peers
-      stratumEndIdx = output.index('stratum')+7
-      stratum = output[stratumEndIdx,stratumEndIdx+3].strip.to_i
-
+      stratum_end_idx = output.index('stratum') + 7
+      stratum = output[stratum_end_idx, stratum_end_idx + 3].strip.to_i
       # Synced
-      synced='clock synced'
-      unsynced='clock unsynced'
-
+      # synced = 'clock synced'
+      unsynced = 'clock unsynced'
       # Offset
-      offset=output[/offset (...), clock/, 1].strip
-
-    rescue
+      offset = output[/offset (...), clock/, 1].strip
+    rescue StandardError
       unknown 'NTP command Failed'
     end
 
@@ -99,9 +96,10 @@ class CheckNTP < Sensu::Plugin::Check::CLI
       critical "NTP stratum (#{stratum}) above limit (#{config[:stratum]})"
     end
 
-    offset_f = offset.sub('s','').to_f
+    offset_f = offset.sub('s', '').to_f
 
-    message = "NTP offset by #{offset}"
+    message = "NTP offset by #{offset} peers #{num_connected}/#{num_available}"
+    warning message if num_connected.zero?
     critical message if offset_f >= config[:crit] || offset_f <= -config[:crit]
     warning message if offset_f >= config[:warn] || offset_f <= -config[:warn]
     ok message

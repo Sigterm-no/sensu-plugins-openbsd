@@ -11,6 +11,9 @@ AbcSize:
 FileName:
   Enabled: false
 
+Style/SymbolArray:
+  Enabled: false
+
 PerceivedComplexity:
   Enabled: false
 
@@ -36,4 +39,7 @@ Style/FlipFlop:
 Metrics/BlockLength:
   Enabled: true
   Exclude:
-    - 'test/**/*'
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'test/**/*.rb'
+    - 'sensu-plugins-openbsd.gemspec'
