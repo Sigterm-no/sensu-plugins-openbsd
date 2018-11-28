@@ -99,7 +99,7 @@ class CheckNTP < Sensu::Plugin::Check::CLI
     offset_f = offset.sub('s', '').to_f
 
     message = "NTP offset by #{offset} peers #{num_connected}/#{num_available}"
-    warning message if num_connected.zero?
+    warning message if num_connected.to_i.zero?
     critical message if offset_f >= config[:crit] || offset_f <= -config[:crit]
     warning message if offset_f >= config[:warn] || offset_f <= -config[:warn]
     ok message
