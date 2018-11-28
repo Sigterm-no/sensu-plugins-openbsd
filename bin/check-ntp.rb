@@ -75,8 +75,8 @@ class CheckNTP < Sensu::Plugin::Check::CLI
       unsynced = 'clock unsynced'
       # Offset
       offset = output[/offset (...), clock/, 1].strip
-    rescue StandardError
-      unknown 'NTP command Failed'
+    rescue StandardError => e
+      unknown 'NTP command Failed: #{e}'
     end
 
     if output.include? unsynced
