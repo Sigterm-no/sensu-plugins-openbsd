@@ -46,8 +46,8 @@ class CheckOpenBGPd < Sensu::Plugin::Check::CLI
     end
 
     critical message if num_peers.zero?
-    critical message if peers_success_ratio >= config[:crit] || peers_success_ratio <= -config[:crit]
-    warning message if peers_success_ratio >= config[:warn] || peers_success_ratio <= -config[:warn]
+    critical message if peers_success_ratio <= config[:crit] || peers_success_ratio >= -config[:crit]
+    warning message if peers_success_ratio <= config[:warn] || peers_success_ratio >= -config[:warn]
     ok message
   end
 end
